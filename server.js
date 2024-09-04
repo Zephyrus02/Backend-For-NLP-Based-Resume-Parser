@@ -66,6 +66,10 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+app.get("/", (req, res) => {
+	res.send("Hello World");
+});
+
 // Endpoint to handle file upload
 app.post("/upload", upload.single("pdf"), (req, res) => {
 	if (!req.file) {
