@@ -77,7 +77,7 @@ app.post("/upload", upload.single("pdf"), (req, res) => {
 	const successMessage = `File uploaded successfully: ${req.file.filename}`;
 	logMessage(successMessage);
 
-	// Schedule file deletion after 10 minutes
+	// Schedule file deletion after 3 minutes
 	setTimeout(() => {
 		const filePath = path.join(__dirname, "uploads", req.file.filename);
 
@@ -88,7 +88,7 @@ app.post("/upload", upload.single("pdf"), (req, res) => {
 				logMessage(`File deleted successfully: ${req.file.filename}`);
 			}
 		});
-	}, 600000); // 600000 milliseconds = 10 minutes
+	}, 180000); // 180000 milliseconds = 3 minutes
 
 	res.send({ message: "File uploaded successfully", file: req.file });
 });
