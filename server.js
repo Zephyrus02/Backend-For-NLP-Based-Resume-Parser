@@ -1,10 +1,9 @@
-// server.js
-
 const express = require("express");
 const multer = require("multer");
 const cors = require("cors");
 const path = require("path");
 const fs = require("fs"); // Import the file system module
+require("dotenv").config();
 
 // Initialize express app
 const app = express();
@@ -95,6 +94,34 @@ app.post("/upload", upload.single("pdf"), (req, res) => {
 	}, 180000); // 180000 milliseconds = 3 minutes
 
 	res.send({ message: "File uploaded successfully", file: req.file });
+
+	const axios = require("axios");
+
+	const LinkedIn_API_Key = process.env.LinkedIn_API_Key;
+	const apiEndpoint = "https://nubela.co/proxycurl/api/v2/linkedin/company/job";
+
+	const params = {
+		job_type: "anything",
+		experience_level: "entry_level",
+		when: "past-week",
+		flexibility: "remote",
+		keyword: "fullstack developer",
+	};
+
+	axios
+		.get(apiEndpoint, {
+			headers: {
+				Authorization: `Bearer ${LinkedIn_API_Key}`,
+				"Content-Type": "application/json",
+			},
+			params: params,
+		})
+		.then((response) => {
+			console.log(response.data);
+		})
+		.catch((error) => {
+			console.error("Error fetching data:", error);
+		});
 });
 
 // Error handling for multer
@@ -104,9 +131,9 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 app.listen(PORT, () => {
 	const startupMessage = `Server is running on port ${PORT}`;
 	logMessage(startupMessage);
-  console.log(startupMessage);
+	console.log(startupMessage);
 });
