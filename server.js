@@ -42,10 +42,40 @@ const fetchJobData = async () => {
 	const LinkedIn_API_Key = process.env.LinkedIn_API_Key;
 	const apiEndpoint = process.env.LinkedIn_API_Endpoint;
 
+	const jobdata = {
+		job: [
+			{
+				company: "Microsoft",
+				company_url: "https://www.linkedin.com/company/microsoft",
+				job_title:
+					"Product Management: Intern Opportunities for University Students",
+				job_url:
+					"https://www.linkedin.com/jobs/view/product-management-intern-opportunities-for-university-students-at-microsoft-3203330682",
+				list_date: "2022-10-09",
+				location: "New York, NY",
+			},
+			{
+				company: "Microsoft",
+				company_url: "https://www.linkedin.com/company/microsoft",
+				job_title: "Content Strategist",
+				job_url:
+					"https://www.linkedin.com/jobs/view/content-strategist-at-microsoft-3257692764",
+				list_date: "2022-10-21",
+				location: "United States",
+			},
+		],
+		next_page_api_url:
+			"http://nubela.co/proxycurl/proxycurl/api/v2/linkedin/company/job?pagination=eyJwYWdlIjogMX0\u0026search_id=1035",
+		next_page_no: 1,
+		previous_page_api_url: null,
+		previous_page_no: null,
+	};
+
 	const params = {
 		job_type: "anything",
 		experience_level: "anything",
 		when: "past-week",
+		geo_id: 102713980,
 		keyword: "fullstack developer",
 		limit: 6,
 	};
@@ -59,11 +89,12 @@ const fetchJobData = async () => {
 			params: params,
 		});
 
-		console.log("Job data fetched successfully");
+		logMessage(" -> Job data fetched successfully");
 		return response.data.job; // Assuming response contains jobs array
 	} catch (error) {
-		console.log(`Error fetching data: ${error.message}`);
-		throw error;
+		logMessage(` -> Error fetching data: ${error.message}`);
+		// throw error;
+		return jobdata.job;
 	}
 };
 
@@ -78,7 +109,7 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
 	const successMessage = `File uploaded successfully: ${req.file.filename}`;
 	logMessage(successMessage);
 
-	// Schedule file deletion after 3 minutes
+	// Schedule file deletion after 2 minutes
 	setTimeout(() => {
 		const filePath = path.join(__dirname, "uploads", req.file.filename);
 
@@ -89,7 +120,7 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
 				logMessage(`File deleted successfully: ${req.file.filename}`);
 			}
 		});
-	}, 180000); // 180000 milliseconds = 3 minutes
+	}, 120000); // 120000 milliseconds = 2 minutes
 
 	// Fetch job data after successful upload
 	try {
