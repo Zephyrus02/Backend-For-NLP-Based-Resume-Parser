@@ -38,48 +38,256 @@ const deleteExistingFiles = () => {
 deleteExistingFiles();
 
 // Function to fetch job data from LinkedIn API
-const fetchJobData = async () => {
+const fetchJobData = async (job_title) => {
 	const LinkedIn_API_Key = process.env.LinkedIn_API_Key;
 	const apiEndpoint = process.env.LinkedIn_API_Endpoint;
-
-	const jobdata = {
-		job: [
-			{
-				company: "Microsoft",
-				company_url: "https://www.linkedin.com/company/microsoft",
-				job_title:
-					"Product Management: Intern Opportunities for University Students",
-				job_url:
-					"https://www.linkedin.com/jobs/view/product-management-intern-opportunities-for-university-students-at-microsoft-3203330682",
-				list_date: "2022-10-09",
-				location: "New York, NY",
-			},
-			{
-				company: "Microsoft",
-				company_url: "https://www.linkedin.com/company/microsoft",
-				job_title: "Content Strategist",
-				job_url:
-					"https://www.linkedin.com/jobs/view/content-strategist-at-microsoft-3257692764",
-				list_date: "2022-10-21",
-				location: "United States",
-			},
-		],
-		next_page_api_url:
-			"http://nubela.co/proxycurl/proxycurl/api/v2/linkedin/company/job?pagination=eyJwYWdlIjogMX0\u0026search_id=1035",
-		next_page_no: 1,
-		previous_page_api_url: null,
-		previous_page_no: null,
-	};
 
 	const params = {
 		job_type: "anything",
 		experience_level: "anything",
 		when: "past-week",
 		geo_id: 102713980,
-		keyword: "fullstack developer",
+		keyword: job_title,
 		limit: 6,
 	};
 
+	// Testing job data
+	const jobdata = {
+		job: [
+			{
+				company: "Jio",
+				company_url: "https://www.linkedin.com/company/jio",
+				job_title: "Fullstack Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-developer-at-jio-4019918545",
+				list_date: "2024-09-08",
+				location: "Gurgaon, Haryana, India",
+			},
+			{
+				company: "Jio",
+				company_url: "https://www.linkedin.com/company/jio",
+				job_title: "Fullstack Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-developer-at-jio-4019919642",
+				list_date: "2024-09-08",
+				location: "Navi Mumbai, Maharashtra, India",
+			},
+			{
+				company: "Codebase",
+				company_url: "https://www.linkedin.com/company/codebasedotcom",
+				job_title: "FullStack Web Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-web-developer-at-codebase-4021578087",
+				list_date: "2024-09-09",
+				location: "Pune, Maharashtra, India",
+			},
+			{
+				company: "Citi",
+				company_url: "https://www.linkedin.com/company/citi",
+				job_title: "React Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/react-developer-at-citi-4020457169",
+				list_date: "2024-09-09",
+				location: "Pune, Maharashtra, India",
+			},
+			{
+				company: "Maple Green Recruitment Services",
+				company_url:
+					"https://www.linkedin.com/company/maple-green-recruitment-services",
+				job_title: "Fullstack Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-developer-at-maple-green-recruitment-services-4019977208",
+				list_date: "2024-09-09",
+				location: "Bengaluru, Karnataka, India",
+			},
+			{
+				company: "Petpooja",
+				company_url:
+					"https://www.linkedin.com/company/petpooja-prayosha-food-service-pvt-ltd-",
+				job_title: "PHP Fullstack Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/php-fullstack-developer-at-petpooja-4019901200",
+				list_date: "2024-09-08",
+				location: "Ahmedabad, Gujarat, India",
+			},
+			{
+				company: "Weekday (YC W21)",
+				company_url: "https://www.linkedin.com/company/weekdayworks",
+				job_title: "FullStack Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-developer-at-weekday-yc-w21-4014539061",
+				list_date: "2024-09-04",
+				location: "Bengaluru, Karnataka, India",
+			},
+			{
+				company: "Whitefield Careers",
+				company_url: "https://www.linkedin.com/company/whitefield-careers",
+				job_title: "Fullstack Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-developer-at-whitefield-careers-4013967917",
+				list_date: "2024-09-03",
+				location: "Bengaluru, Karnataka, India",
+			},
+			{
+				company: "Fractal",
+				company_url: "https://www.linkedin.com/company/fractal-analytics",
+				job_title: "Fullstack Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-developer-at-fractal-3631867155",
+				list_date: "2024-09-06",
+				location: "Bengaluru, Karnataka, India",
+			},
+			{
+				company: "Infosys",
+				company_url: "https://www.linkedin.com/company/infosys",
+				job_title: "Full Stack Engineer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/full-stack-engineer-at-infosys-4004306993",
+				list_date: "2024-09-05",
+				location: "Bengaluru, Karnataka, India",
+			},
+			{
+				company: "Whitefield Careers",
+				company_url: "https://www.linkedin.com/company/whitefield-careers",
+				job_title: "Java Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/java-developer-at-whitefield-careers-4015802705",
+				list_date: "2024-09-05",
+				location: "Bengaluru, Karnataka, India",
+			},
+			{
+				company: "TITAN CONSULTANCY",
+				company_url: "https://www.linkedin.com/company/titan-consultancy",
+				job_title: "FULLSTACK DEVELOPER REACT JS",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-developer-react-js-at-titan-consultancy-4019691814",
+				list_date: "2024-09-08",
+				location: "Bengaluru, Karnataka, India",
+			},
+			{
+				company: "Orbion Infotech",
+				company_url: "https://www.linkedin.com/company/orbion-infotech",
+				job_title: "Full stack developer-Immediate joiner-Remote",
+				job_url:
+					"https://www.linkedin.com/jobs/view/full-stack-developer-immediate-joiner-remote-at-orbion-infotech-4016745988",
+				list_date: "2024-09-06",
+				location: "India",
+			},
+			{
+				company: "Techerudite",
+				company_url: "https://www.linkedin.com/company/techerudite",
+				job_title: "Javascript Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/javascript-developer-at-techerudite-4019676703",
+				list_date: "2024-09-08",
+				location: "Ahmedabad, Gujarat, India",
+			},
+			{
+				company: "Talentbot Technologies",
+				company_url: "https://www.linkedin.com/company/talentbottechnologies",
+				job_title: "Fullstack Developer - A6478",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-developer-a6478-at-talentbot-technologies-4021673146",
+				list_date: "2024-09-09",
+				location: "Hyderabad, Telangana, India",
+			},
+			{
+				company: "Fractal",
+				company_url: "https://www.linkedin.com/company/fractal-analytics",
+				job_title: "Full Stack Developer(React.js + Python)",
+				job_url:
+					"https://www.linkedin.com/jobs/view/full-stack-developer-react-js-%2B-python-at-fractal-3982753246",
+				list_date: "2024-09-08",
+				location: "Bengaluru, Karnataka, India",
+			},
+			{
+				company: "Information Dynamics",
+				company_url: "https://www.linkedin.com/company/infodynamicsoff",
+				job_title: "Java Developer / Fullstack Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/java-developer-fullstack-developer-at-information-dynamics-4019680549",
+				list_date: "2024-09-08",
+				location: "Chennai, Tamil Nadu, India",
+			},
+			{
+				company: "r3 Consultant",
+				company_url: "https://www.linkedin.com/company/r3consultant",
+				job_title: "Fullstack Javascript Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-javascript-developer-at-r3-consultant-4019685731",
+				list_date: "2024-09-08",
+				location: "Pune, Maharashtra, India",
+			},
+			{
+				company: "r3 Consultant",
+				company_url: "https://www.linkedin.com/company/r3consultant",
+				job_title: "Fullstack Javascript Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-javascript-developer-at-r3-consultant-4019684490",
+				list_date: "2024-09-08",
+				location: "Pune, Maharashtra, India",
+			},
+			{
+				company: "r3 Consultant",
+				company_url: "https://www.linkedin.com/company/r3consultant",
+				job_title: "Fullstack Javascript Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-javascript-developer-at-r3-consultant-4019691042",
+				list_date: "2024-09-08",
+				location: "Pune, Maharashtra, India",
+			},
+			{
+				company: "r3 Consultant",
+				company_url: "https://www.linkedin.com/company/r3consultant",
+				job_title: "Fullstack Javascript Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-javascript-developer-at-r3-consultant-4019690206",
+				list_date: "2024-09-08",
+				location: "Pune, Maharashtra, India",
+			},
+			{
+				company: "Amber",
+				company_url: "https://www.linkedin.com/company/amberstudent",
+				job_title: "Associate Software Engineer-Fullstack",
+				job_url:
+					"https://www.linkedin.com/jobs/view/associate-software-engineer-fullstack-at-amber-4019094433",
+				list_date: "2024-09-06",
+				location: "Pune, Maharashtra, India",
+			},
+			{
+				company: "Blaash.io",
+				company_url: "https://www.linkedin.com/company/blaash-io",
+				job_title: "Fullstack Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-developer-at-blaash-io-4019688372",
+				list_date: "2024-09-08",
+				location: "Bengaluru, Karnataka, India",
+			},
+			{
+				company: "Techerudite",
+				company_url: "https://www.linkedin.com/company/techerudite",
+				job_title: "Javascript Developer",
+				job_url:
+					"https://www.linkedin.com/jobs/view/javascript-developer-at-techerudite-4019683205",
+				list_date: "2024-09-08",
+				location: "Ahmedabad, Gujarat, India",
+			},
+			{
+				company: "GITS Solutions (Global IT Staffing)",
+				company_url: "https://www.linkedin.com/company/globalitstaffing",
+				job_title: "FullStack Developer - Java & Angular",
+				job_url:
+					"https://www.linkedin.com/jobs/view/fullstack-developer-java-angular-at-gits-solutions-global-it-staffing-4020450730",
+				list_date: "2024-09-09",
+				location: "Bengaluru, Karnataka, India",
+			},
+		],
+		next_page_no: 1,
+		next_page_api_url:
+			"https://nubela.co/proxycurl/api/v2/linkedin/company/job?pagination=eyJwYWdlIjogMSwgIm1ldGhvZCI6ICJmYWNlYm9vayIsICJqb2JzX29mZnNldCI6IDI1fQ&keyword=FullStack+Developer&geo_id=102713980&when=past-week",
+		previous_page_no: null,
+		previous_page_api_url: null,
+	};
 	try {
 		const response = await axios.get(apiEndpoint, {
 			headers: {
@@ -88,13 +296,16 @@ const fetchJobData = async () => {
 			},
 			params: params,
 		});
-
 		logMessage(" -> Job data fetched successfully");
-		return response.data.job; // Assuming response contains jobs array
+
+		console.log(response.data);
+
+		return { jobs: response.data.job };
 	} catch (error) {
 		logMessage(` -> Error fetching data: ${error.message}`);
 		// throw error;
-		return jobdata.job;
+
+		return { jobs: jobdata.job };
 	}
 };
 
@@ -122,13 +333,16 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
 		});
 	}, 120000); // 120000 milliseconds = 2 minutes
 
+	job_title = "FullStack Developer";
+
 	// Fetch job data after successful upload
 	try {
-		const jobData = await fetchJobData();
+		const { jobs, companyLogos } = await fetchJobData(job_title);
 		res.send({
 			message: "File uploaded successfully",
 			file: req.file,
-			jobs: jobData,
+			jobs: jobs,
+			companyLogos: companyLogos,
 		});
 	} catch (error) {
 		console.log(`Error fetching job data after upload: ${error.message}`);
