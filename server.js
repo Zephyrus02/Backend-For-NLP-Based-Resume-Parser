@@ -309,6 +309,21 @@ const fetchJobData = async (job_title) => {
 	}
 };
 
+// Function to parser resume
+const parseResume = async (filePath) => {
+	const resumeData = await axios
+		.post("http://127.0.0.1:5001/send-file-path", {
+			file_path: filePath,
+		})
+		.then((response) => {
+			console.log("Response from Flask API:", response.data);
+		})
+		.catch((error) => {
+			console.error("Error:", error);
+		});
+	return resumeData;
+};
+
 // Endpoint to handle file upload
 app.post("/upload", upload.single("pdf"), async (req, res) => {
 	if (!req.file) {
@@ -320,10 +335,12 @@ app.post("/upload", upload.single("pdf"), async (req, res) => {
 	const successMessage = `File uploaded successfully: ${req.file.filename}`;
 	logMessage(successMessage);
 
+	const filePath = path.join(__dirname, "uploads", req.file.filename);
+
+	await parseResume(filePath);
+
 	// Schedule file deletion after 2 minutes
 	setTimeout(() => {
-		const filePath = path.join(__dirname, "uploads", req.file.filename);
-
 		fs.unlink(filePath, (err) => {
 			if (err) {
 				logMessage(`Error deleting file: ${err.message}`);
