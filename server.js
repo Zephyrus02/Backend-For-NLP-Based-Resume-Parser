@@ -6,10 +6,25 @@ const path = require("path");
 const cors = require("cors");
 const upload = multer({ dest: "uploads/" });
 require("dotenv").config();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 // Initialize express app
 const app = express();
 app.use(cors());
+app.use(express.json());
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('Error connecting to MongoDB:', err));
+
+// User model
+const User = mongoose.model('User', {
+  username: String,
+  password: String
+});
 
 // Function to log messages to a file
 const logFilePath = path.join(__dirname, "server.log"); // Path to log file
@@ -48,7 +63,6 @@ const fetchJobData = async (job_title) => {
 		when: "past-week",
 		geo_id: 102713980,
 		keyword: job_title,
-		limit: 6,
 	};
 
 	// Testing job data
@@ -319,52 +333,102 @@ const parseResume = async (filePath) => {
 			console.log("Response from Flask API:", response.data);
 		})
 		.catch((error) => {
-			console.error("Error:", error);
+			// console.error("Error:", error);
 		});
 	return resumeData;
 };
 
-// Endpoint to handle file upload
-app.post("/upload", upload.single("pdf"), async (req, res) => {
-	if (!req.file) {
-		const errorMessage = "Error: No file uploaded.";
-		logMessage(errorMessage);
-		return res.status(400).send("No file uploaded.");
-	}
 
-	const successMessage = `File uploaded successfully: ${req.file.filename}`;
-	logMessage(successMessage);
+// Registration endpoint
+app.post('/register', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({ username, password: hashedPassword });
+    await user.save();
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    res.status(500).json({ message: 'Error registering user' });
+  }
+});
 
-	const filePath = path.join(__dirname, "uploads", req.file.filename);
+// Login endpoint
+app.post('/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ message: 'Error logging in' });
+  }
+});
 
-	await parseResume(filePath);
+// Middleware to verify JWT
+const verifyToken = (req, res, next) => {
+  const authHeader = req.header('Authorization');
+  if (!authHeader) return res.status(401).json({ message: 'Access denied. No token provided.' });
 
-	// Schedule file deletion after 2 minutes
-	setTimeout(() => {
-		fs.unlink(filePath, (err) => {
-			if (err) {
-				logMessage(`Error deleting file: ${err.message}`);
-			} else {
-				logMessage(`File deleted successfully: ${req.file.filename}`);
-			}
-		});
-	}, 120000); // 120000 milliseconds = 2 minutes
+  const token = authHeader.split(' ')[1]; // Extract the token from "Bearer <token>"
+  if (!token) return res.status(401).json({ message: 'Access denied. Invalid token format.' });
 
-	job_title = "FullStack Developer";
+  try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = verified;
+    next();
+  } catch (error) {
+    res.status(400).json({ message: 'Invalid token' });
+  }
+};
 
-	// Fetch job data after successful upload
-	try {
-		const { jobs, companyLogos } = await fetchJobData(job_title);
-		res.send({
-			message: "File uploaded successfully",
-			file: req.file,
-			jobs: jobs,
-			companyLogos: companyLogos,
-		});
-	} catch (error) {
-		console.log(`Error fetching job data after upload: ${error.message}`);
-		res.status(500).send("File uploaded but failed to fetch job data.");
-	}
+// Update the upload endpoint to use the verifyToken middleware
+app.post("/upload", verifyToken, upload.single("pdf"), async (req, res) => {
+  if (!req.file) {
+    const errorMessage = "Error: No file uploaded.";
+    logMessage(errorMessage);
+    return res.status(400).send("No file uploaded.");
+  }
+
+  const successMessage = `File uploaded successfully: ${req.file.filename}`;
+  logMessage(successMessage);
+
+  const filePath = path.join(__dirname, "uploads", req.file.filename);
+
+  await parseResume(filePath);
+
+  // Schedule file deletion after 2 minutes
+  setTimeout(() => {
+    fs.unlink(filePath, (err) => {
+      if (err) {
+        logMessage(`Error deleting file: ${err.message}`);
+      } else {
+        logMessage(`File deleted successfully: ${req.file.filename}`);
+      }
+    });
+  }, 120000); // 120000 milliseconds = 2 minutes
+
+  job_title = "FullStack Developer";
+
+  // Fetch job data after successful upload
+  try {
+    const { jobs } = await fetchJobData(job_title);
+    res.send({
+      job_title: job_title,
+      message: "File uploaded successfully",
+      file: req.file,
+      jobs: jobs,
+    });
+  } catch (error) {
+    console.log(`Error fetching job data after upload: ${error.message}`);
+    res.status(500).send("File uploaded but failed to fetch job data.");
+  }
 });
 
 // Error handling for multer
