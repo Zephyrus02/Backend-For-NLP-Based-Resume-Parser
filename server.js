@@ -347,6 +347,24 @@ const parseResume = async (filePath) => {
 	return job_title;
 };
 
+// Function to get course recommendations
+const getCourses = async (filePath) => {
+	let courses = "";
+	await axios
+		.post("http://127.0.0.1:5001/get-courses", {
+			file_path: filePath,
+		})
+		.then((response) => {
+			console.log("Response from Flask API:", response.data);
+			courses = response.data;
+		})
+		.catch((error) => {
+			console.error("Error:", error);
+		});
+
+	return courses;
+};
+
 // Registration endpoint
 app.post("/register", async (req, res) => {
 	try {
@@ -427,6 +445,7 @@ app.post("/upload", verifyToken, upload.single("pdf"), async (req, res) => {
 	const filePath = path.join(__dirname, "uploads", req.file.filename);
 
 	let job_title = await parseResume(filePath);
+	let course = await getCourses(filePath); // Get course recommendations
 
 	// Schedule file deletion after 2 minutes
 	setTimeout(() => {
