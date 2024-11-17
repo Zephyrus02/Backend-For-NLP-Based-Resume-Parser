@@ -4,7 +4,6 @@ const axios = require("axios");
 const fs = require("fs");
 const path = require("path");
 const cors = require("cors");
-const upload = multer({ dest: "uploads/" });
 require("dotenv").config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -31,6 +30,18 @@ const User = mongoose.model("User", {
 	username: String,
 	password: String,
 });
+
+// multer storage
+const storage = multer.diskStorage({
+	destination: function (req, file, cb) {
+		cb(null, "uploads/");
+	},
+	filename: function (req, file, cb) {
+		cb(null, `${Date.now()}-${file.originalname}`);
+	},
+});
+
+const upload = multer({ storage: storage });
 
 // Function to log messages to a file
 const logFilePath = path.join(__dirname, "server.log"); // Path to log file
