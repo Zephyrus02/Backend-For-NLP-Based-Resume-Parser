@@ -18,7 +18,7 @@ app.use(cookieParser());
 
 // Connect to MongoDB
 mongoose
-	.connect(process.env.MONGODB_URI, {
+	.connect(process.env.Atlas_URI, {
 		useNewUrlParser: true,
 		useUnifiedTopology: true,
 	})
@@ -385,6 +385,7 @@ app.post("/register", async (req, res) => {
 		await user.save();
 		res.status(201).json({ message: "User registered successfully" });
 	} catch (error) {
+		console.error("Error registering user:", error); // Add this line to log the error
 		res.status(500).json({ message: "Error registering user" });
 	}
 });
