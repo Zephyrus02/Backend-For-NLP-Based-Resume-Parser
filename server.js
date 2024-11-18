@@ -2,6 +2,7 @@ const express = require("express");
 const multer = require("multer");
 const axios = require("axios");
 const fs = require("fs");
+const pdf = require('pdf-parse');
 const path = require("path");
 const cors = require("cors");
 require("dotenv").config();
@@ -340,22 +341,33 @@ const fetchJobData = async (job_title) => {
 	}
 };
 
+// Function to read PDF and convert to string
+async function pdfToString(filePath) {
+    try {
+        const dataBuffer = fs.readFileSync(filePath); // Read PDF file into buffer
+        const pdfData = await pdf(dataBuffer);        // Parse PDF content
+        return pdfData.text;
+    } catch (error) {
+        console.error("Error reading PDF file:", error.message);
+        throw error;
+    }
+}
+
 // Function to parser resume
 const parseResume = async (filePath) => {
-	let job_title = "";
-	await axios
-		.post("http://127.0.0.1:5001/send-file-path", {
-			file_path: filePath,
-		})
-		.then((response) => {
-			console.log("Response from Flask API:", response.data);
-			job_title = response.data;
-		})
-		.catch((error) => {
-			console.error("Error:", error);
-		});
+    try {
+        const text = await pdfToString(filePath);
+        console.log("Parsed text:", text);
 
-	return job_title;
+        const response = await axios.post("http://127.0.0.1:5001/get-role", {
+            text: text,
+        });
+        console.log("Response from Flask API:", response.data);
+        return response.data; // Directly return the job title from the response
+    } catch (error) {
+        console.error("Error parsing resume:", error);
+        throw error;
+    }
 };
 
 // Function to get course recommendations
@@ -496,6 +508,7 @@ app.get("/check-auth", verifyToken, (req, res) => {
 	res.json({ isAuthenticated: true });
 });
 
+// Root endpoint
 app.get("/", (req, res) => {
 	res.send("Hello World!");
 });
